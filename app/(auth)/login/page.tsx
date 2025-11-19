@@ -16,16 +16,19 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+
+    console.log("LOGIN RESPONSE:", data, error);
 
     if (error) {
       setError(error.message);
       return;
     }
 
+    // Si todo salió bien -> redirigimos
     router.push("/dashboard");
   };
 
