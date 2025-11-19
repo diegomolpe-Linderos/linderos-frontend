@@ -1,26 +1,20 @@
-import './globals.css';
+import "./globals.css";
+import type { Metadata } from "next";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: "Linderos Digital",
-  description: "Dashboard con Power BI embebido"
+  description: "Dashboard Power BI"
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="es">
       <body>{children}</body>
     </html>
   );
 }
-import { redirect } from "next/navigation";
-import { getUser } from "@/lib/getUser";
 
-export default async function DashboardLayout({ children }) {
-  const user = await getUser();
-
-  if (!user) {
-    redirect("/login");
-  }
-
-  return <>{children}</>;
-}
