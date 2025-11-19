@@ -1,16 +1,10 @@
 "use client";
 
 import { useState } from "react";
-// Importar createClient si lo tenías aquí, aunque es mejor en lib/supabase.ts
-// Como lo tenías aquí, lo dejamos para que funcione:
-import { createClient } from "@supabase/supabase-js"; 
 import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase"; // ⬅️ ¡La clave! Importamos el cliente
 
-// Inicialización del cliente Supabase (usa la versión que tenías)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// ELIMINAMOS la inicialización local de createClient que estaba fallando
 
 export default function LoginPage() {
   const router = useRouter();
@@ -25,40 +19,36 @@ export default function LoginPage() {
     setError("");
 
     try {
-        // Llama a la API de Supabase para iniciar sesión
-        const { data, error: authError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-        if (authError) {
-            // Error específico de Supabase (ej: credenciales inválidas)
-            setError("Credenciales inválidas o usuario no confirmado.");
-            // Nota: No se llama a setLoading(false) aquí, se hace en el bloque 'finally'
-            return;
-        }
+      if (authError) {
+        // Error específico de Supabase (ej: credenciales inválidas)
+        setError("Credenciales inválidas o usuario no confirmado.");
+        return;
+      }
 
-        // Obtener el token JWT
-        const jwt = data.session?.access_token;
+      // Obtener el token JWT
+      const jwt = data.session?.access_token;
 
-        if (!jwt) {
-            setError("No se pudo obtener la sesión.");
-            return;
-        }
+      if (!jwt) {
+        setError("No se pudo obtener la sesión.");
+        return;
+      }
 
-        // Guardar token y redirigir
-        localStorage.setItem("ld_token", jwt);
-        router.push("/dashboard");
-        // Nota: Cuando hay push, la página se desmonta, por lo que el finally puede omitirse,
-        // pero lo dejamos para capturar el error de red antes de este punto.
+      // Guardar token y redirigir
+      localStorage.setItem("ld_token", jwt);
+      router.push("/dashboard");
 
     } catch (e) {
-        // Captura cualquier error de red o timeout
-        console.error("Fallo de conexión en el login:", e);
-        setError("Error de conexión con el servidor. Intente de nuevo.");
+      // Captura cualquier error de red o timeout
+      console.error("Fallo de conexión en el login:", e);
+      setError("Error de conexión con el servidor. Intente de nuevo.");
     } finally {
-        // ESTO ES CLAVE: Se ejecuta siempre y libera el botón.
-        setLoading(false);
+      // Se ejecuta siempre y libera el botón.
+      setLoading(false);
     }
   };
 
@@ -79,7 +69,7 @@ export default function LoginPage() {
           type="email"
           className="w-full border px-3 py-2 rounded mb-4"
           onChange={(e) => setEmail(e.target.value)}
-          value={email} // Agregar value para control completo
+          value={email}
         />
 
         <label className="block mb-2 text-sm">Password</label>
@@ -87,12 +77,12 @@ export default function LoginPage() {
           type="password"
           className="w-full border px-3 py-2 rounded mb-4"
           onChange={(e) => setPassword(e.target.value)}
-          value={password} // Agregar value para control completo
+          value={password}
         />
 
         <button
           disabled={loading}
-          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50" // Añadir estilo para deshabilitado
+          className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:opacity-50"
         >
           {loading ? "Ingresando..." : "Ingresar"}
         </button>
