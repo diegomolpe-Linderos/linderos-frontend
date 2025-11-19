@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase"; // ⬅️ ¡La clave! Importamos el cliente
+import { supabase } from "../../../lib/supabase"; // ⬅️ ¡La clave! Importamos el cliente
 
 // ELIMINAMOS la inicialización local de createClient que estaba fallando
 
