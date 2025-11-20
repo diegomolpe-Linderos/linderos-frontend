@@ -1,82 +1,108 @@
 "use client";
 
 import { useState } from "react";
-import { getSupabaseClient } from "@/lib/supabase";
+import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
-  const supabase = getSupabaseClient();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // Función para manejar el login
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault(); // Evitar recarga de la página
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    setError(""); // Limpiar cualquier error previo
-    console.log("Intentando login con:", email, password);
+    try {
+      const supabase = createClient();
+      
+      console.log("Intentando login con:", email);
 
-    // Intentar hacer el login con Supabase
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password: password,
+      });
 
-    // Asegúrate de que "data" existe antes de loguearlo
-    if (data) {
-      console.log("SUPABASE RESPONSE: Data:", JSON.stringify(data, null, 2));
-    } else {
-      console.log("SUPABASE RESPONSE: No data returned.");
+      if (authError) {
+        console.error("Error de autenticación:", authError);
+        setError(authError.message);
+        return;
+      }
+
+      if (data?.session) {
+        console.log("✅ Login exitoso:", data.user?.email);
+        router.refresh();
+        router.push("/dashboard");
+      } else {
+        setError("No se pudo establecer la sesión");
+      }
+    } catch (err) {
+      console.error("Error inesperado:", err);
+      setError("Error al iniciar sesión. Intenta nuevamente.");
+    } finally {
+      setLoading(false);
     }
-
-    if (error) {
-      console.log("SUPABASE RESPONSE: Error:", error);
-      setError(error.message); // Si hay un error, mostrar mensaje
-      return;
-    }
-
-    router.push("/dashboard"); // Redirigir al dashboard si login exitoso
   };
 
   return (
-    <div className="flex flex-col items-center justify-center w-full h-screen">
+    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gray-50">
       <form
         onSubmit={handleLogin}
-        className="flex flex-col gap-4 p-6 rounded-lg border w-80"
+        className="flex flex-col gap-4 p-8 rounded-lg border bg-white shadow-lg w-96"
       >
-        <h1 className="text-xl font-semibold">Iniciar sesión</h1>
+        <h1 className="text-2xl font-semibold text-center mb-2">Iniciar sesión</h1>
 
-        <input
-          type="email"
-          className="border p-2 rounded"
-          placeholder="Correo"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
+        <div className="flex flex-col gap-2">
+          <label htmlFor="email" className="text-sm font-medium text-gray-700">
+            Correo electrónico
+          </label>
+          <input
+            id="email"
+            type="email"
+            required
+            className="border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="tu@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
+          />
+        </div>
 
-        <input
-          type="password"
-          className="border p-2 rounded"
-          placeholder="Contraseña"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        <div className="flex flex-col gap-2">
+          <label htmlFor="password" className="text-sm font-medium text-gray-700">
+            Contraseña
+          </label>
+          <input
+            id="password"
+            type="password"
+            required
+            className="border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="••••••••"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
+          />
+        </div>
 
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
+            {error}
+          </div>
+        )}
 
         <button
           type="submit"
-          className="bg-blue-600 px-4 py-2 text-white rounded"
+          disabled={loading}
+          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          Entrar
+          {loading ? "Iniciando sesión..." : "Entrar"}
         </button>
       </form>
     </div>
   );
 }
-
 
 
