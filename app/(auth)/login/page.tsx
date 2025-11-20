@@ -19,16 +19,21 @@ export default function LoginPage() {
     setError(""); // Limpiar cualquier error previo
     console.log("Intentando login con:", email, password);
 
+    // Intentar hacer el login con Supabase
     const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    // Imprimir los detalles completos de la respuesta de Supabase
-    console.log("SUPABASE RESPONSE: Data:", data);
-    console.log("SUPABASE RESPONSE: Error:", error);
+    // Asegúrate de que "data" existe antes de loguearlo
+    if (data) {
+      console.log("SUPABASE RESPONSE: Data:", JSON.stringify(data, null, 2));
+    } else {
+      console.log("SUPABASE RESPONSE: No data returned.");
+    }
 
     if (error) {
+      console.log("SUPABASE RESPONSE: Error:", error);
       setError(error.message); // Si hay un error, mostrar mensaje
       return;
     }
@@ -72,5 +77,6 @@ export default function LoginPage() {
     </div>
   );
 }
+
 
 
