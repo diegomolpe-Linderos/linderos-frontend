@@ -43,7 +43,7 @@ export default function LoginPage() {
         setLoggedIn(true, data.user?.email);
         console.log("✅ localStorage actualizado");
         console.log("✅ Redirigiendo a dashboard...");
-        router.push("/dashboard");
+        window.location.href = "/dashboard";
       } else {
         console.error("❌ No hay sesión en la respuesta");
         setError("No se pudo establecer la sesión");
