@@ -60,59 +60,70 @@ export default function LoginPage() {
   console.log("🔵 Componente LoginPage renderizado");
 
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gray-50">
-      <form
-        onSubmit={handleLogin}
-        className="flex flex-col gap-4 p-8 rounded-lg border bg-white shadow-lg w-96"
-      >
-        <h1 className="text-2xl font-semibold text-center mb-2">Iniciar sesión</h1>
-
-        <div className="flex flex-col gap-2">
-          <label htmlFor="email" className="text-sm font-medium text-gray-700">
-            Correo electrónico
-          </label>
-          <input
-            id="email"
-            type="email"
-            required
-            className="border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="tu@email.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            disabled={loading}
-          />
+    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#334155]">
+      <div className="flex flex-col items-center gap-8 w-full max-w-md px-6">
+        <div className="text-center">
+          <h1 className="text-4xl font-bold text-white mb-2">Linderos Digital</h1>
+          <p className="text-blue-200 text-sm">Sistema de Reportes</p>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <label htmlFor="password" className="text-sm font-medium text-gray-700">
-            Contraseña
-          </label>
-          <input
-            id="password"
-            type="password"
-            required
-            className="border border-gray-300 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="••••••••"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={loading}
-          />
-        </div>
-
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-3 py-2 rounded text-sm">
-            {error}
-          </div>
-        )}
-
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 px-4 py-2 text-white rounded font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        <form
+          onSubmit={handleLogin}
+          className="flex flex-col gap-6 p-8 rounded-2xl bg-white/95 backdrop-blur-sm shadow-2xl w-full"
         >
-          {loading ? "Iniciando sesión..." : "Entrar"}
-        </button>
-      </form>
+          <h2 className="text-2xl font-semibold text-gray-800 text-center">Iniciar sesión</h2>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="email" className="text-sm font-medium text-gray-700">
+              Correo electrónico
+            </label>
+            <input
+              id="email"
+              type="email"
+              required
+              className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              placeholder="tu@email.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
+            />
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="password" className="text-sm font-medium text-gray-700">
+              Contraseña
+            </label>
+            <input
+              id="password"
+              type="password"
+              required
+              className="border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              placeholder="••••••••"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
+            />
+          </div>
+
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-4 py-3 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
+          >
+            {loading ? "Iniciando sesión..." : "Entrar"}
+          </button>
+        </form>
+
+        <p className="text-blue-100 text-xs text-center">
+          © 2025 Linderos Digital. Todos los derechos reservados.
+        </p>
+      </div>
     </div>
   );
 }
