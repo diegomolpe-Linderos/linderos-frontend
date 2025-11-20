@@ -9,12 +9,21 @@ export default function Dashboard() {
   const router = useRouter();
   const [activeReport, setActiveReport] = useState('ventas');
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem('ld:loggedIn');
-    if (!isLoggedIn) {
-      router.replace('/login');
-    }
+    const checkSession = async () => {
+      const supabase = createClient();
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        router.replace('/login');
+      } else {
+        setIsLoading(false);
+      }
+    };
+    
+    checkSession();
   }, [router]);
 
   const handleLogout = async () => {
@@ -31,6 +40,14 @@ export default function Dashboard() {
     localStorage.clear();
     window.location.href = '/login';
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-100">
+        <div className="text-xl text-gray-600">Cargando...</div>
+      </div>
+    );
+  }
 
   const reports = [
     {
@@ -62,7 +79,7 @@ export default function Dashboard() {
               
               return (
                 <li key={report.id}>
-                                    <button
+                  <button
                     onClick={() => setActiveReport(report.id)}
                     disabled={report.id === 'contable'}
                     className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
@@ -99,25 +116,17 @@ export default function Dashboard() {
       </aside>
 
       <main className="flex-1 relative">
-        <div className="w-full h-full" style={{ paddingTop: '56.25%', position: 'relative' }}>
+        <div className="absolute inset-0">
           <iframe
-            title={reports.find(r => r.id === activeReport)?.name}
             src={reports.find(r => r.id === activeReport)?.url}
-            frameBorder="0"
-            allowFullScreen={true}
-            style={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%'
-            }}
-          />
-          <div 
-            className="absolute bottom-0 left-0 right-0 bg-gray-100" 
-            style={{ height: '40px' }}
+            className="w-full h-full border-0"
+            allowFullScreen
           />
         </div>
+        <div 
+          className="absolute bottom-0 left-0 right-0 h-12 bg-white pointer-events-none"
+          style={{ zIndex: 10 }}
+        />
       </main>
     </div>
   );
