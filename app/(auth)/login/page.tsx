@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import { setLoggedIn } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -34,7 +35,7 @@ export default function LoginPage() {
 
       if (data?.session) {
         console.log("✅ Login exitoso:", data.user?.email);
-        router.refresh();
+        setLoggedIn(true, data.user?.email);
         router.push("/dashboard");
       } else {
         setError("No se pudo establecer la sesión");
@@ -104,5 +105,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
-

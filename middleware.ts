@@ -54,16 +54,13 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Obtener sesión actual
   const { data: { session } } = await supabase.auth.getSession()
 
-  // Si NO hay sesión y está intentando acceder al dashboard
   if (!session && request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/auth/login', request.url))
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Si YA hay sesión y está intentando acceder al login, redirigir al dashboard
-  if (session && request.nextUrl.pathname.startsWith('/auth/login')) {
+  if (session && request.nextUrl.pathname.startsWith('/login')) {
     return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
@@ -72,9 +69,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Proteger todas las rutas del dashboard
     '/dashboard/:path*',
-    // También verificar en la ruta de login para redirigir si ya está autenticado
-    '/auth/login',
+    '/login',
   ],
 }
