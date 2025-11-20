@@ -54,14 +54,13 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  const { data: { session } } = await supabase.auth.getSession()
+  await supabase.auth.getSession()
 
-  if (!session && request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/login', request.url))
-  }
-
-  if (session && request.nextUrl.pathname.startsWith('/login')) {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
+  if (request.nextUrl.pathname.startsWith('/login')) {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (session) {
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
   }
 
   return response
@@ -69,7 +68,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/dashboard/:path*',
     '/login',
   ],
 }
