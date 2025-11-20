@@ -1,71 +1,124 @@
 'use client';
 
-import React from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { isLoggedIn, setLoggedIn } from '@/lib/auth';
-import { LogOut } from 'lucide-react';
+import { LogOut, FileText, TrendingUp } from 'lucide-react';
+import { createClient } from '@/lib/supabase';
 
-const POWER_BI_URL =
-  'https://app.powerbi.com/view?r=eyJrIjoiYmM0N2M2ZGUtOWVkNS00NDAxLThiMTQtZjU4OTViZWRhNTA2IiwidCI6ImZlMWUzNDQwLTYzNmUtNDgxNC05OTNkLWQyOWZhOTk2ZDkwMyIsImMiOjR9';
-
-const OVERLAY_HEIGHT = 40;
-
-export default function DashboardVentas() {
+export default function Dashboard() {
   const router = useRouter();
+  const [activeReport, setActiveReport] = useState('ventas');
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  React.useEffect(() => {
-    if (!isLoggedIn()) router.replace('/login');
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem('ld:loggedIn');
+    if (!isLoggedIn) {
+      router.replace('/login');
+    }
   }, [router]);
 
-  const handleLogout = () => {
-    setLoggedIn(false);
-    router.push('/login');
+  const handleLogout = async () => {
+    if (isLoggingOut) return;
+    setIsLoggingOut(true);
+    
+    try {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+    
+    localStorage.clear();
+    window.location.href = '/login';
   };
 
+  const reports = [
+    {
+      id: 'contable',
+      name: 'Reporte Contable',
+      icon: FileText,
+      url: '#'
+    },
+    {
+      id: 'ventas',
+      name: 'Reporte Ventas',
+      icon: TrendingUp,
+      url: 'https://app.powerbi.com/view?r=eyJrIjoiYmM0N2M2ZGUtOWVkNS00NDAxLThiMTQtZjU4OTViZWRhNTA2IiwidCI6ImZlMWUzNDQwLTYzNmUtNDgxNC05OTNkLWQyOWZhOTk2ZDkwMyIsImMiOjR9'
+    }
+  ];
+
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-800 flex">
-      <aside className="w-64 text-white relative" style={{ background: '#1f2a44' }}>
-        <div className="px-5 py-5 font-semibold tracking-wide">Linderos Digital Dashboard</div>
-        <nav className="mt-1 text-sm">
-          <div className="px-5 py-2.5 text-white/90 select-none cursor-pointer transition-all duration-300 hover:bg-white/5 hover:translate-x-1">
-            Reporte Contable
-          </div>
-          <div className="px-5 py-2.5 font-semibold transition-all duration-300 hover:translate-x-1" style={{ background: '#2a3b66', borderRight: '3px solid #8ab4ff' }}>
-            Reporte Ventas
-          </div>
+    <div className="flex h-screen bg-gray-100">
+      <aside className="w-64 flex flex-col" style={{ backgroundColor: '#1f2a44' }}>
+        <div className="p-6 border-b border-gray-700">
+          <h1 className="text-2xl font-bold text-white">Linderos Digital</h1>
+        </div>
+        
+        <nav className="flex-1 p-4">
+          <ul className="space-y-2">
+            {reports.map((report) => {
+              const Icon = report.icon;
+              const isActive = activeReport === report.id;
+              
+              return (
+                <li key={report.id}>
+                                    <button
+                    onClick={() => setActiveReport(report.id)}
+                    disabled={report.id === 'contable'}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                      isActive
+                        ? 'text-white translate-x-2'
+                        : report.id === 'contable'
+                        ? 'text-gray-500 cursor-not-allowed'
+                        : 'text-gray-300 hover:text-white hover:translate-x-1'
+                    }`}
+                    style={{
+                      backgroundColor: isActive ? '#2a3b66' : 'transparent',
+                      borderLeft: isActive ? '3px solid #8ab4ff' : '3px solid transparent'
+                    }}
+                  >
+                    <Icon size={20} />
+                    <span className="font-medium">{report.name}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
         </nav>
-        <button
-          onClick={handleLogout}
-          className="absolute bottom-0 w-64 px-5 py-3 text-sm text-white/80 hover:text-white hover:bg-white/5 transition-all duration-300 flex items-center gap-2"
-          style={{ borderTop: '1px solid rgba(255,255,255,.12)' }}
-        >
-          <LogOut size={16} />
-          Cerrar Sesión
-        </button>
+
+        <div className="p-4 border-t border-gray-700">
+          <button
+            onClick={handleLogout}
+            disabled={isLoggingOut}
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
+          >
+            <LogOut size={20} />
+            <span>{isLoggingOut ? 'Cerrando...' : 'Cerrar Sesión'}</span>
+          </button>
+        </div>
       </aside>
 
-      <div className="flex-1 min-w-0 flex flex-col">
-        <header className="h-14 bg-white border-b flex items-center px-4 lg:px-6">
-          <h1 className="text-lg font-semibold">Reporte Ventas</h1>
-        </header>
-
-        <main className="p-4 lg:p-6">
-          <section className="mx-auto max-w-6xl">
-            <div className="bg-white rounded-lg border p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h2 className="text-sm font-semibold">Dashboard de Ventas</h2>
-              </div>
-
-              <div className="rounded-md p-2" style={{ background: '#F6F7FB', border: '1px solid #e5e7eb' }}>
-                <div className="relative w-full overflow-hidden" style={{ paddingTop: '56.25%' }}>
-                  <iframe title="Power BI Report" src={POWER_BI_URL} allowFullScreen className="absolute inset-0 w-full h-full rounded border-0" />
-                  <div className="absolute left-0 right-0 bottom-0" style={{ height: OVERLAY_HEIGHT, background: '#F6F7FB' }} />
-                </div>
-              </div>
-            </div>
-          </section>
-        </main>
-      </div>
+      <main className="flex-1 relative">
+        <div className="w-full h-full" style={{ paddingTop: '56.25%', position: 'relative' }}>
+          <iframe
+            title={reports.find(r => r.id === activeReport)?.name}
+            src={reports.find(r => r.id === activeReport)?.url}
+            frameBorder="0"
+            allowFullScreen={true}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%'
+            }}
+          />
+          <div 
+            className="absolute bottom-0 left-0 right-0 bg-gray-100" 
+            style={{ height: '40px' }}
+          />
+        </div>
+      </main>
     </div>
   );
 }
