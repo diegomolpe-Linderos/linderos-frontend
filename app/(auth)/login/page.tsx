@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  // Aquí va la función completa de login
+  // Función para manejar el login
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Evitar recarga de la página
 
@@ -24,7 +24,9 @@ export default function LoginPage() {
       password,
     });
 
-    console.log("SUPABASE RESPONSE:", { data, error });
+    // Imprimir los detalles completos de la respuesta de Supabase
+    console.log("SUPABASE RESPONSE: Data:", data);
+    console.log("SUPABASE RESPONSE: Error:", error);
 
     if (error) {
       setError(error.message); // Si hay un error, mostrar mensaje
