@@ -1,8 +1,16 @@
-export default function LoginPage() {
+import { createClient } from "@supabase/supabase-js";
 
-  console.log("ENV CHECK FROM LOGIN PAGE:");
-  console.log("URL:", process.env.NEXT_PUBLIC_SUPABASE_URL);
-  console.log("KEY:", process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+export function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-  const router = useRouter();
-  const supabase = getSupabaseClient();
+  return createClient(supabaseUrl, supabaseAnonKey, {
+    auth: {
+      persistSession: true,
+      storageKey: "linderos-auth",
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+    },
+  });
+}
+
