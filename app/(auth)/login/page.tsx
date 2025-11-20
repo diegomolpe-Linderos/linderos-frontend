@@ -14,39 +14,50 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log("🔵 handleLogin ejecutado");
     setError("");
     setLoading(true);
 
     try {
       const supabase = createClient();
+      console.log("🔵 Cliente Supabase creado:", supabase);
       
-      console.log("Intentando login con:", email);
+      console.log("🔵 Intentando login con:", email);
 
       const { data, error: authError } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password,
       });
 
+      console.log("🔵 Respuesta de Supabase:", { data, authError });
+
       if (authError) {
-        console.error("Error de autenticación:", authError);
+        console.error("❌ Error de autenticación:", authError);
         setError(authError.message);
         return;
       }
 
       if (data?.session) {
         console.log("✅ Login exitoso:", data.user?.email);
+        console.log("✅ Sesión:", data.session);
         setLoggedIn(true, data.user?.email);
+        console.log("✅ localStorage actualizado");
+        console.log("✅ Redirigiendo a dashboard...");
         router.push("/dashboard");
       } else {
+        console.error("❌ No hay sesión en la respuesta");
         setError("No se pudo establecer la sesión");
       }
     } catch (err) {
-      console.error("Error inesperado:", err);
+      console.error("❌ Error inesperado:", err);
       setError("Error al iniciar sesión. Intenta nuevamente.");
     } finally {
       setLoading(false);
+      console.log("🔵 Loading finalizado");
     }
   };
+
+  console.log("🔵 Componente LoginPage renderizado");
 
   return (
     <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gray-50">
