@@ -2,7 +2,8 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { isLoggedIn } from '@/lib/auth';
+import { isLoggedIn, setLoggedIn } from '@/lib/auth';
+import { createClient } from '@/lib/supabase';
 import { X } from 'lucide-react';
 
 const POWER_BI_URL =
@@ -52,8 +53,13 @@ export default function DashboardVentas() {
         {/* Logout funcional (desktop) */}
         <button
           type="button"
-          onClick={() => {
+          onClick={async () => {
             try {
+              const supabase = createClient();
+              await supabase.auth.signOut();
+            } catch {}
+            try {
+              setLoggedIn(false);
               localStorage.removeItem('loggedIn');
               localStorage.removeItem('loggedEmail');
             } catch {}
@@ -108,8 +114,13 @@ export default function DashboardVentas() {
             {/* Logout funcional (móvil) */}
             <button
               type="button"
-              onClick={() => {
+              onClick={async () => {
                 try {
+                  const supabase = createClient();
+                  await supabase.auth.signOut();
+                } catch {}
+                try {
+                  setLoggedIn(false);
                   localStorage.removeItem('loggedIn');
                   localStorage.removeItem('loggedEmail');
                 } catch {}
