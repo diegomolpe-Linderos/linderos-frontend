@@ -1,133 +1,158 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React from 'react';
 import { useRouter } from 'next/navigation';
-import { LogOut, FileText, TrendingUp } from 'lucide-react';
-import { createClient } from '@/lib/supabase';
+import { isLoggedIn } from '@/lib/auth';
+import { X } from 'lucide-react';
 
-export default function Dashboard() {
+const POWER_BI_URL =
+  'https://app.powerbi.com/view?r=eyJrIjoiYmM0N2M2ZGUtOWVkNS00NDAxLThiMTQtZjU4OTViZWRhNTA2IiwidCI6ImZlMWUzNDQwLTYzNmUtNDgxNC05OTNkLWQyOWZhOTk2ZDkwMyIsImMiOjR9';
+
+const OVERLAY_HEIGHT = 40; // px
+
+export default function DashboardVentas() {
   const router = useRouter();
-  const [activeReport, setActiveReport] = useState('ventas');
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [openSidebar, setOpenSidebar] = React.useState(false);
 
-  useEffect(() => {
-    const checkSession = async () => {
-      const supabase = createClient();
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        router.replace('/login');
-      } else {
-        setIsLoading(false);
-      }
-    };
-    
-    checkSession();
+  React.useEffect(() => {
+    if (!isLoggedIn()) router.replace('/login');
   }, [router]);
 
-  const handleLogout = async () => {
-    if (isLoggingOut) return;
-    setIsLoggingOut(true);
-    
-    try {
-      const supabase = createClient();
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error);
-    }
-    
-    localStorage.clear();
-    window.location.href = '/login';
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen bg-gray-100">
-        <div className="text-xl text-gray-600">Cargando...</div>
-      </div>
-    );
-  }
-
-  const reports = [
-    {
-      id: 'contable',
-      name: 'Reporte Contable',
-      icon: FileText,
-      url: '#'
-    },
-    {
-      id: 'ventas',
-      name: 'Reporte Ventas',
-      icon: TrendingUp,
-      url: 'https://app.powerbi.com/view?r=eyJrIjoiYmM0N2M2ZGUtOWVkNS00NDAxLThiMTQtZjU4OTViZWRhNTA2IiwidCI6ImZlMWUzNDQwLTYzNmUtNDgxNC05OTNkLWQyOWZhOTk2ZDkwMyIsImMiOjR9'
-    }
-  ];
+  React.useEffect(() => {
+    if (openSidebar) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [openSidebar]);
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <aside className="w-64 flex flex-col" style={{ backgroundColor: '#1f2a44' }}>
-        <div className="p-6 border-b border-gray-700">
-          <h1 className="text-2xl font-bold text-white">Linderos Digital</h1>
-        </div>
-        
-        <nav className="flex-1 p-4">
-          <ul className="space-y-2">
-            {reports.map((report) => {
-              const Icon = report.icon;
-              const isActive = activeReport === report.id;
-              
-              return (
-                <li key={report.id}>
-                  <button
-                    onClick={() => setActiveReport(report.id)}
-                    disabled={report.id === 'contable'}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
-                      isActive
-                        ? 'text-white translate-x-2'
-                        : report.id === 'contable'
-                        ? 'text-gray-500 cursor-not-allowed'
-                        : 'text-gray-300 hover:text-white hover:translate-x-1'
-                    }`}
-                    style={{
-                      backgroundColor: isActive ? '#2a3b66' : 'transparent',
-                      borderLeft: isActive ? '3px solid #8ab4ff' : '3px solid transparent'
-                    }}
-                  >
-                    <Icon size={20} />
-                    <span className="font-medium">{report.name}</span>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </nav>
+    <div className="min-h-screen bg-gray-100 text-gray-800 flex">
+      {/* Sidebar desktop */}
+      <aside
+        className="hidden lg:block w-64 text-white relative"
+        style={{
+          // Gradiente verde corporativo (alineado al login)
+          background: 'linear-gradient(135deg, #2f4f1f 0%, #6e8a29 50%, #88a732 100%)',
+        }}
+      >
+        <div className="px-5 py-5 font-semibold tracking-wide">Quality Travel</div>
+        <nav className="mt-1 text-sm">
+          <div className="px-5 py-2.5 text-white/90 select-none">Reporte Contable</div>
 
-        <div className="p-4 border-t border-gray-700">
-          <button
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
+          {/* Ítem activo: borde verde corporativo + efecto expandir */}
+          <div
+            className="px-5 py-2.5 font-semibold transform transition-all duration-200 hover:scale-[1.02] hover:shadow-sm"
+            style={{
+              background: '#2a3b66',
+              borderRight: '3px solid #88a732', // Corporativo: borde verde
+            }}
           >
-            <LogOut size={20} />
-            <span>{isLoggingOut ? 'Cerrando...' : 'Cerrar Sesión'}</span>
-          </button>
+            Reporte Ventas
+          </div>
+        </nav>
+        <div
+          className="absolute bottom-0 w-64 px-5 py-3 text-sm text-white/80"
+          style={{ borderTop: '1px solid rgba(255,255,255,.12)' }}
+        >
+          Logout
         </div>
       </aside>
 
-      <main className="flex-1 relative">
-        <div className="absolute inset-0">
-          <iframe
-            src={reports.find(r => r.id === activeReport)?.url}
-            className="w-full h-full border-0"
-            allowFullScreen
+      {/* Drawer móvil */}
+      {openSidebar && (
+        <div className="lg:hidden fixed inset-0 z-40">
+          <div
+            className="absolute inset-0 bg-black/40"
+            onClick={() => setOpenSidebar(false)}
+            aria-label="Cerrar menú"
+            role="button"
+            tabIndex={0}
           />
+          <div
+            className="absolute left-0 top-0 bottom-0 w-64 text-white flex flex-col"
+            style={{
+              // Mismo gradiente verde corporativo
+              background: 'linear-gradient(135deg, #2f4f1f 0%, #6e8a29 50%, #88a732 100%)',
+            }}
+          >
+            <div className="px-5 py-4 flex items-center justify-between">
+              <span className="font-semibold">Quality Travel</span>
+              <button
+                className="inline-flex p-2 rounded-md hover:bg-white/10"
+                onClick={() => setOpenSidebar(false)}
+                aria-label="Cerrar"
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <nav className="mt-1 text-sm flex-1 overflow-auto">
+              <div className="px-5 py-2.5 text-white/90 select-none">Reporte Contable</div>
+
+              {/* Ítem activo en móvil: borde verde + efecto expandir */}
+              <div
+                className="px-5 py-2.5 font-semibold transform transition-all duration-200 hover:scale-[1.02] hover:shadow-sm"
+                style={{
+                  background: '#2a3b66',
+                  borderRight: '3px solid #88a732', // Corporativo: borde verde
+                }}
+              >
+                Reporte Ventas
+              </div>
+            </nav>
+            <div
+              className="px-5 py-3 text-sm text-white/80"
+              style={{ borderTop: '1px solid rgba(255,255,255,.12)' }}
+            >
+              Logout
+            </div>
+          </div>
         </div>
-        <div 
-          className="absolute bottom-0 left-0 right-0 h-12 bg-white pointer-events-none"
-          style={{ zIndex: 10 }}
-        />
-      </main>
+      )}
+
+      {/* Main */}
+      <div className="flex-1 min-w-0 flex flex-col">
+        <header className="h-14 bg-white border-b flex items-center px-4 lg:px-6 justify-between">
+          <button
+            className="lg:hidden inline-flex items-center justify-center p-2 rounded-md hover:bg-gray-100"
+            onClick={() => setOpenSidebar(true)}
+            aria-label="Abrir menú"
+          >
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M3 6h18M3 12h18M3 18h18" stroke="#111827" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </button>
+          <h1 className="text-base lg:text-lg font-semibold">Reporte Ventas</h1>
+          <span className="w-6" />
+        </header>
+
+        <main className="p-4 lg:p-6">
+          <section className="mx-auto max-w-6xl">
+            <div className="bg-white rounded-lg border p-3 lg:p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h2 className="text-sm lg:text-base font-semibold">Dashboard de Ventas</h2>
+                <span className="text-xs text-gray-500 hidden sm:inline">Formato 16:9</span>
+              </div>
+
+              <div className="rounded-md p-1 lg:p-2" style={{ background: '#F6F7FB', border: '1px solid #e5e7eb' }}>
+                <div className="relative w-full overflow-hidden" style={{ paddingTop: '56.25%' }}>
+                  <iframe
+                    title="Power BI Report"
+                    src={POWER_BI_URL}
+                    allowFullScreen
+                    className="absolute inset-0 w-full h-full rounded border-0"
+                  />
+                  <div className="absolute left-0 right-0 bottom-0" style={{ height: OVERLAY_HEIGHT, background: '#F6F7FB' }} />
+                </div>
+              </div>
+
+              <p className="mt-2 text-[11px] text-gray-500">
+                Vista responsive. En móvil el menú se abre como drawer y el reporte mantiene 16:9.
+              </p>
+            </div>
+          </section>
+        </main>
+      </div>
     </div>
   );
 }
