@@ -28,6 +28,7 @@ export default function DashboardVentas() {
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800 flex">
+      {/* Sidebar desktop */}
       <aside
         className="hidden lg:block w-64 text-white relative"
         style={{
@@ -47,14 +48,25 @@ export default function DashboardVentas() {
             Reporte Ventas
           </div>
         </nav>
-        <div
-          className="absolute bottom-0 w-64 px-5 py-3 text-sm text-white/80"
+
+        {/* Logout funcional (desktop) */}
+        <button
+          type="button"
+          onClick={() => {
+            try {
+              localStorage.removeItem('loggedIn');
+              localStorage.removeItem('loggedEmail');
+            } catch {}
+            window.location.href = '/login';
+          }}
+          className="absolute bottom-0 w-64 px-5 py-3 text-left text-sm text-white/90 hover:bg-white/10 transition-colors"
           style={{ borderTop: '1px solid rgba(255,255,255,.12)' }}
         >
           Logout
-        </div>
+        </button>
       </aside>
 
+      {/* Drawer móvil */}
       {openSidebar && (
         <div className="lg:hidden fixed inset-0 z-40">
           <div
@@ -92,16 +104,27 @@ export default function DashboardVentas() {
                 Reporte Ventas
               </div>
             </nav>
-            <div
-              className="px-5 py-3 text-sm text-white/80"
+
+            {/* Logout funcional (móvil) */}
+            <button
+              type="button"
+              onClick={() => {
+                try {
+                  localStorage.removeItem('loggedIn');
+                  localStorage.removeItem('loggedEmail');
+                } catch {}
+                window.location.href = '/login';
+              }}
+              className="px-5 py-3 text-left text-sm text-white/90 hover:bg-white/10 transition-colors"
               style={{ borderTop: '1px solid rgba(255,255,255,.12)' }}
             >
               Logout
-            </div>
+            </button>
           </div>
         </div>
       )}
 
+      {/* Main */}
       <div className="flex-1 min-w-0 flex flex-col">
         <header className="h-14 bg-white border-b flex items-center px-4 lg:px-6 justify-between">
           <button
@@ -136,10 +159,6 @@ export default function DashboardVentas() {
                   <div className="absolute left-0 right-0 bottom-0" style={{ height: OVERLAY_HEIGHT, background: '#F6F7FB' }} />
                 </div>
               </div>
-
-              <p className="mt-2 text-[11px] text-gray-500">
-                Vista responsive en movil con drawer. El reporte mantiene 16:9.
-              </p>
             </div>
           </section>
         </main>
