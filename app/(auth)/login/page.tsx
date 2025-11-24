@@ -60,10 +60,10 @@ export default function LoginPage() {
   console.log("🔵 Componente LoginPage renderizado");
 
   return (
-    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#334155]">
+    <div className="flex flex-col items-center justify-center w-full min-h-screen bg-gradient-to-br from-[#2f4f1f] via-[#6e8a29] to-[#88a732]">
       <div className="flex flex-col items-center gap-8 w-full max-w-md px-6">
         <div className="text-center">
-          <h1 className="text-4xl font-bold text-white mb-2">Linderos Digital</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">QUALITY TRAVEL</h1>
           <p className="text-blue-200 text-sm">Sistema de Reportes</p>
         </div>
 
