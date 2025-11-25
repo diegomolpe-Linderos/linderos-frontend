@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase';
 import { X } from 'lucide-react';
 
 const POWER_BI_URL =
-  'https://app.powerbi.com/view?r=eyJrIjoiYmM0N2M2ZGUtOWVkNS00NDAxLThiMTQtZjU4OTViZWRhNTA2IiwidCI6ImZlMWUzNDQwLTYzNmUtNDgxNC05OTNkLWQyOWZhOTk2ZDkwMyIsImMiOjR9';
+  'https://app.powerbi.com/view?r=eyJrIjoiYzI0MDg1NzgtZGI5OS00MmIyLTk1OTctNmUyMmViMDdhMGU2IiwidCI6ImU4OTcxOTMwLWMwZTQtNDMzYS1iZTFlLWFmYzYyYTllZmFmYSIsImMiOjR9';
 
 const OVERLAY_HEIGHT = 40;
 
