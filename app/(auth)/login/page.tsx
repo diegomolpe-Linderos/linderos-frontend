@@ -57,6 +57,15 @@ export default function LoginPage() {
           <p className="text-blue-200 text-sm">Sistema de Reportes</p>
         </div>
 
+        {/* Banner de credenciales para modo demo */}
+        {IS_DEMO && (
+          <div className="w-full mb-1 rounded-lg border border-yellow-400/30 bg-yellow-50/5 px-4 py-3 text-[13px] text-yellow-200">
+            Modo Demo — Acceso:{" "}
+            <span className="font-semibold">demo@linderosdigital.cl</span> /{" "}
+            <span className="font-semibold">demo1234</span>
+          </div>
+        )}
+
         <form
           onSubmit={handleLogin}
           className="flex flex-col gap-6 p-8 rounded-2xl backdrop-blur-sm shadow-2xl w-full"
@@ -77,6 +86,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={loading}
+              autoComplete="email"
             />
           </div>
 
@@ -93,6 +103,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
+              autoComplete="current-password"
             />
           </div>
 
