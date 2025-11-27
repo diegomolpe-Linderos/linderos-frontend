@@ -5,9 +5,7 @@ import { useRouter } from 'next/navigation';
 import { isLoggedIn, setLoggedIn } from '@/lib/auth';
 import { createClient } from '@/lib/supabase';
 import { X } from 'lucide-react';
-
-const POWER_BI_URL =
-  'https://app.powerbi.com/view?r=eyJrIjoiYzI0MDg1NzgtZGI5OS00MmIyLTk1OTctNmUyMmViMDdhMGU2IiwidCI6ImU4OTcxOTMwLWMwZTQtNDMzYS1iZTFlLWFmYzYyYTllZmFmYSIsImMiOjR9';
+import { APP_NAME, COLORS, POWER_BI_URL } from '@/lib/config';
 
 const OVERLAY_HEIGHT = 40;
 
@@ -20,44 +18,33 @@ export default function DashboardVentas() {
   }, [router]);
 
   React.useEffect(() => {
-    if (openSidebar) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = '';
-    return () => {
-      document.body.style.overflow = '';
-    };
+    document.body.style.overflow = openSidebar ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
   }, [openSidebar]);
 
   return (
     <div className="min-h-screen bg-gray-100 text-gray-800 flex">
-      {/* Sidebar desktop */}
       <aside
         className="hidden lg:block w-64 text-white relative"
         style={{
-          background: 'linear-gradient(135deg, #2f4f1f 0%, #6e8a29 50%, #88a732 100%)',
+          background: `linear-gradient(135deg, ${COLORS.bgStart} 0%, ${COLORS.bgMid} 50%, ${COLORS.bgEnd} 100%)`,
         }}
       >
-        <div className="px-5 py-5 font-semibold tracking-wide">Quality Travel</div>
+        <div className="px-5 py-5 font-semibold tracking-wide">{APP_NAME}</div>
         <nav className="mt-1 text-sm">
-          <div className="px-5 py-2.5 text-white/90 select-none">Reporte Contable</div>
+          <div className="px-5 py-2.5 text-white/90 select-none">Reportes</div>
           <div
             className="px-5 py-2.5 font-semibold transform transition-all duration-200 hover:scale-[1.02] hover:shadow-sm"
-            style={{
-              background: '#2a3b66',
-              borderRight: '3px solid #88a732',
-            }}
+            style={{ background: '#2a3b66', borderRight: `3px solid ${COLORS.bgEnd}` }}
           >
             Reporte Ventas
           </div>
         </nav>
 
-        {/* Logout funcional (desktop) */}
         <button
           type="button"
           onClick={async () => {
-            try {
-              const supabase = createClient();
-              await supabase.auth.signOut();
-            } catch {}
+            try { await createClient().auth.signOut(); } catch {}
             try {
               setLoggedIn(false);
               localStorage.removeItem('loggedIn');
@@ -72,53 +59,35 @@ export default function DashboardVentas() {
         </button>
       </aside>
 
-      {/* Drawer móvil */}
       {openSidebar && (
         <div className="lg:hidden fixed inset-0 z-40">
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setOpenSidebar(false)}
-            aria-label="Cerrar menu"
-            role="button"
-            tabIndex={0}
-          />
+          <div className="absolute inset-0 bg-black/40" onClick={() => setOpenSidebar(false)} />
           <div
             className="absolute left-0 top-0 bottom-0 w-64 text-white flex flex-col"
             style={{
-              background: 'linear-gradient(135deg, #2f4f1f 0%, #6e8a29 50%, #88a732 100%)',
+              background: `linear-gradient(135deg, ${COLORS.bgStart} 0%, ${COLORS.bgMid} 50%, ${COLORS.bgEnd} 100%)`,
             }}
           >
             <div className="px-5 py-4 flex items-center justify-between">
-              <span className="font-semibold">Quality Travel</span>
-              <button
-                className="inline-flex p-2 rounded-md hover:bg-white/10"
-                onClick={() => setOpenSidebar(false)}
-                aria-label="Cerrar"
-              >
+              <span className="font-semibold">{APP_NAME}</span>
+              <button className="inline-flex p-2 rounded-md hover:bg-white/10" onClick={() => setOpenSidebar(false)}>
                 <X size={18} />
               </button>
             </div>
             <nav className="mt-1 text-sm flex-1 overflow-auto">
-              <div className="px-5 py-2.5 text-white/90 select-none">Reporte Contable</div>
+              <div className="px-5 py-2.5 text-white/90 select-none">Reportes</div>
               <div
                 className="px-5 py-2.5 font-semibold transform transition-all duration-200 hover:scale-[1.02] hover:shadow-sm"
-                style={{
-                  background: '#2a3b66',
-                  borderRight: '3px solid #88a732',
-                }}
+                style={{ background: '#2a3b66', borderRight: `3px solid ${COLORS.bgEnd}` }}
               >
                 Reporte Ventas
               </div>
             </nav>
 
-            {/* Logout funcional (móvil) */}
             <button
               type="button"
               onClick={async () => {
-                try {
-                  const supabase = createClient();
-                  await supabase.auth.signOut();
-                } catch {}
+                try { await createClient().auth.signOut(); } catch {}
                 try {
                   setLoggedIn(false);
                   localStorage.removeItem('loggedIn');
@@ -135,7 +104,6 @@ export default function DashboardVentas() {
         </div>
       )}
 
-      {/* Main */}
       <div className="flex-1 min-w-0 flex flex-col">
         <header className="h-14 bg-white border-b flex items-center px-4 lg:px-6 justify-between">
           <button
@@ -167,7 +135,7 @@ export default function DashboardVentas() {
                     allowFullScreen
                     className="absolute inset-0 w-full h-full rounded border-0"
                   />
-                  <div className="absolute left-0 right-0 bottom-0" style={{ height: OVERLAY_HEIGHT, background: '#F6F7FB' }} />
+                  <div className="absolute left-0 right-0 bottom-0" style={{ height: 40, background: '#F6F7FB' }} />
                 </div>
               </div>
             </div>
