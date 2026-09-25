@@ -481,9 +481,23 @@ function frescura(){
 
 /* ---------- cálculo por BIP ---------- */
 
+// M.prog y M.dec vienen indexados por asignación (ej. "30403479-0-002"), no por BIP directo:
+// hay que sumar todas las asignaciones cuya clave empieza con "<bip>-" (o es exactamente el bip).
+function agregarPorBip(mapa, b, largo){
+  const acc = new Array(largo).fill(0);
+  const prefijo = b+'-';
+  for(const k in mapa){
+    if(k===b || k.indexOf(prefijo)===0){
+      const arr = mapa[k];
+      for(let i=0;i<largo;i++) acc[i] += (arr[i]||0);
+    }
+  }
+  return acc;
+}
+
 function calcular(b){
-  const prog = M.prog[b] || new Array(14).fill(0);
-  const dec  = M.dec[b]  || [0,0,0,0,0,0];
+  const prog = agregarPorBip(M.prog, b, 14);
+  const dec  = agregarPorBip(M.dec, b, 6);
   const decBip = M.decBip[b] || 0;
   const contratos = M.contracts[b] || [];
 
