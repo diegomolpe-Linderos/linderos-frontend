@@ -1,10 +1,11 @@
 // Cloudflare Pages Function: /api/data
 // GET  -> devuelve el blob cifrado guardado en KV (público: el contenido va cifrado igual)
-// POST -> reemplaza el blob en KV, requiere Authorization: Bearer <PUBLISH_TOKEN>
+// POST -> reemplaza el blob en KV, requiere Authorization: Bearer <PUBLISH_TOKEN> o <PUBLISH_TOKEN_ARIEL>
 //
 // Requiere en el proyecto de Cloudflare Pages:
 //  - Un KV namespace enlazado con el binding "BIP_KV"
-//  - Una variable de entorno secreta "PUBLISH_TOKEN"
+//  - Una variable de entorno secreta "PUBLISH_TOKEN" (token maestro de Diego)
+//  - Una variable de entorno secreta "PUBLISH_TOKEN_ARIEL" (token de publicación de Ariel, opcional)
 
 const KV_KEY = 'modelo';
 
@@ -31,7 +32,10 @@ export async function onRequestPost({ request, env }) {
   const auth = request.headers.get('Authorization') || '';
   const token = auth.startsWith('Bearer ') ? auth.slice(7) : '';
 
-  if (!env.PUBLISH_TOKEN || token !== env.PUBLISH_TOKEN) {
+  const tokensValidos = [env.PUBLISH_TOKEN, env.PUBLISH_TOKEN_ARIEL].filter(Boolean);
+  const autorizado = tokensValidos.length > 0 && tokensValidos.includes(token);
+
+  if (!autorizado) {
     return cors(new Response(JSON.stringify({ error: 'No autorizado.' }), {
       status: 401,
       headers: { 'Content-Type': 'application/json' }
